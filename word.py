@@ -9,9 +9,15 @@ class Word:
         self.line = line
 
     def __str__(self):
+        """Overloads the string operator to return a string containing just the word"""
         return self.word
 
     def checkWord(self):
+        """Finds alternatives to the misspelled word, has the user pick which alternative they want, and returns a tuple
+        containing the original word and the replacement word
+        :param: No parameters
+        :return: A tuple containing the original word and the replacement word
+        """
         # gets a list of possible intended words
         ist = self.findAlternatives()
         # sorts the list by the arbitrary designations of how similar they are to the original
@@ -20,11 +26,20 @@ class Word:
         return self.chooseAlternative(ist, self.line)
 
     def checkSpelled(self):
+        """checks if the word is in the dictionary
+        :param: No parameters
+        :return: True if in dictionary, False otherwise
+        """
         if self.word in self.dict:
             return True
         return False
 
     def findAlternatives(self):
+        """for the misspelled word, calls 6 helper methods to find similar words, and returns a list of all the unique
+        similar words
+        :param: No parameters
+        :return: A list containing tuples with unique similar words and a number corresponding to their likelihood
+        """
         answer = []
         checkreplicates = []
         # calls all of the supporting functions to find intended words and stores them in a list
@@ -33,7 +48,7 @@ class Word:
             if ans[0] not in checkreplicates:
                 answer.append(ans)
                 checkreplicates.append(ans[0])
-        for ans in self.singleTranspostions():
+        for ans in self.singleTranspositions():
             if ans[0] not in checkreplicates:
                 answer.append(ans)
                 checkreplicates.append(ans[0])
@@ -56,6 +71,12 @@ class Word:
         return answer
 
     def chooseAlternative(self, ist, line):
+        """gives the user a list of possible words, and has them choose a word. Returns a tuple of the word they choose
+        and a number indicating its similarity to the original
+        :param ist: a List containing the similar words
+        :param line: a string with the line of the misspelled word
+        :return: A tuple containing the chosen intended word and its similarity number
+        """
         # prints the incorrectly spelled word, its line, and the first 20 suggested words (or as many exist)
         print("\n The incorrectly spelled word is: " + str(self.word) + "\nIt's line is: ")
         print(self.line)
@@ -77,9 +98,15 @@ class Word:
             if upper == 1:
                 return (ist[i][0].capitalize(), ist[i][1])
         # returns the user's chosen word
-        return ist[i]
+        if i < min(20, len(ist)):
+            return ist[i]
+        return (self.word, 0)
 
-    def singleTranspostions(self):
+    def singleTranspositions(self):
+        """creates possible words by flipping pairs of letters. Ex: turns "wrogn" into "wrong"
+        :param: No parameters
+        :return: A list containing tuples with similar words and the number 2 (which corresponds to their likelihood)
+        """
         # creates possible words by flipping pairs of letters. Example: turns "wrogn" into "wrong"
         answer = []
         w = self.word
@@ -92,6 +119,11 @@ class Word:
         return answer
 
     def permutations(self):
+        """creates possible words by considering permutations of the word if the word is less than 6 letters
+        :param: No parameters
+        :return: A list containing tuples with correctly spelled permutations of the word and the number 6
+        (which corresponds to their likelihood as the intended word)
+        """
         # for words less than 6 letters, considers
         # permutations of the word. Ex: turns "ritgh" to "right"
         answer = []
@@ -106,6 +138,11 @@ class Word:
         return words
 
     def vowelPermutations(self):
+        """creates possible words by considers permutations of the vowels in the word.
+        Ex: turns "understindang" to "understanding"
+        :param: No parameters
+        :return: A list containing tuples with the permutations and the number 4 (which corresponds to their likelihood)
+        """
         # considers permutations of the vowels in a word. Ex: turns "understindang" to "understanding"
         vowels = ""
         indices = []
@@ -130,7 +167,10 @@ class Word:
         return answers
 
     def addDouble(self):
-        # creates intended words by replacing single letters with double letters. Ex: turns "sucess" to "success"
+        """creates possible words by replacing single letters with double letters. Ex: "turns sucess" to "success"
+        :param: No parameters
+        :return: A list containing tuples with the new words and the number 3 (corresponds to their likelihood)
+        """
         answer = []
         w = self.word
         # for each letter in the word
@@ -142,7 +182,10 @@ class Word:
         return answer
 
     def removeDouble(self):
-        # creates new words by removing double letters. Ex: turns "worrd" to "word"
+        """creates possible words by removing double letters. Ex: turns "worrds" to "words"
+        :param: No parameters
+        :return: A list containing tuples with the new words and the number 1 (which corresponds to their likelihood)
+        """
         answer = []
         w = self.word
         for i in range(0, len(w) - 1):
@@ -154,7 +197,11 @@ class Word:
         return answer
 
     def transpose(self):
-        # creates intended words by trying out different letters at each index. Ex: turns "misteke" to "mistake"
+        """creates possible words by replacing letters with other letters in the alphabet.
+        Ex: turns "misteke" to "mistake"
+        :param: No parameters
+        :return: A list containing tuples with the new words and the number 5 (which corresponds to their likelihood)
+        """
         answer = []
         w = self.word
         letters = "abcdefghijklmnopqrstuvwxyz"

@@ -4,13 +4,13 @@ import string
 
 
 class SpellChecker:
-    """Spell checker class"""
+    """Spell checker class for storing lists of text from a file and running spell checks on them"""
     def __init__(self):
         ist = []
         name = input("Enter the name of the text file you want to correct")
-        self.name = name
+        self._name = name
         # opens text file, replaces punctuation and excess spaces, and reads line by line into a list
-        with open(self.name) as f:
+        with open(self._name) as f:
             for line in f:
                 line1 = line
                 s = string.punctuation
@@ -22,51 +22,60 @@ class SpellChecker:
                 line1 = line1.strip(" ")
                 lower = line1.lower()
                 ist.append(lower)
-        self.lines = ist
+        self._lines = ist
         # reads entire text file into a string
-        with open(self.name) as f:
-            self.text = f.read()
+        with open(self._name) as f:
+            self._text = f.read()
         words = {}
         # opens a dictionary text file, and stores each word in a dictionary
         with open('words_alpha.txt') as w:
             for w in w.read().split("\n"):
                 words[w] = ""
-        self.dict = words
-        self.corrected = []
+        self._dict = words
+        self._corrected = []
 
     def check(self):
+        """iterates over each word in each line, finds a corrected word if necessary, and then replaces each word
+        in the original text and overwrites the original file
+        :param: No parameters
+        :return: None
+        """
         # creates a line object for each line, and calls the function to check the line
-        for line in self.lines:
-            #l = Line(line, self.dict)
+        for line in self._lines:
             corrected = []
             for word in line.split(" "):
-                w = Word(word, self.dict, line)
+                w = Word(word, self._dict, line)
                 if not w.checkSpelled():
                     corrected.append([word, w.checkWord()])
-            self.corrected.append(corrected)
+            self._corrected.append(corrected)
         # calls two supporting function to replace misspelled words and overwrite original text file
         self.replace()
         self.write()
         print("Successfully replaced any misspelled words in the original text file")
 
     def replace(self):
-        # for each misspelled word and its corrected word, replaces the misspelled word by its correction in the
-        # string holding the original text. Also accounts for capitalized words
-        for instance in self.corrected:
+        """for each misspelled word and its corrected word, replaces the misspelled word by its correction in the
+        string holding the original text
+        :param: No parameters
+        :return: None
+        """
+        for instance in self._corrected:
             for word in instance:
+                # if the replacement word is not the same as the original word
                 if word[0] != word[1][0]:
-                    self.text = self.text.replace(word[0], word[1][0])
-                    self.text = self.text.replace(word[0].capitalize(), word[1][0])
+                    self._text = self._text.replace(word[0], word[1][0])
+                    # accounts for capitalization since I turned the original text lowercase in self._lines
+                    self._text = self._text.replace(word[0].capitalize(), word[1][0])
 
     def write(self):
-        # overwrites original text file with corrected string
-        with open(self.name, 'w') as f:
-            f.write(self.text)
+        """overwrites original text file with corrected string
+        :param: No parameters
+        :return: None
+        """
+        with open(self._name, 'w') as f:
+            f.write(self._text)
 
 
-
-s = SpellChecker()
-s.check()
 
 
 
